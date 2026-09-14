@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="EETDjBh7153hycXkqk5Gr9">
+<head data-page-node-id="T6ZqPMaOFQEPDauZzVqHjw">
+<meta charset="UTF-8" data-page-node-id="fJ2BNPkzceTyktZXtDmqkY">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="rEgpkiBbuIGbB6ocPsZglb">
+<title>paperless-lite 使用说明（零基础版）</title>
+<style>
+  :root {
+    /* 护眼模式：低蓝光豆沙绿，长时间阅读不易疲劳 */
+    --bg: #cfe6cd; --panel: #e6f1e2; --card: #f4f9f1; --acc-soft: #d3e8d4;
+    --line: #b7cdb5; --text: #24342a; --faint: #56695c;
+    --accent: #1f6e4e; --ok: #1a7f37; --warn: #8a6100;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: "Microsoft YaHei", "PingFang SC", sans-serif; line-height: 1.7; padding: 32px 16px; }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 26px; margin-bottom: 6px; }
+  h1 + p { color: var(--faint); margin-bottom: 28px; }
+  h2 { font-size: 19px; margin: 34px 0 14px; padding-left: 10px; border-left: 4px solid var(--accent); }
+  h3 { font-size: 15px; margin: 18px 0 8px; color: var(--accent); }
+  p, li { font-size: 14px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin: 12px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13.5px; background: var(--panel); }
+  th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--acc-soft); color: var(--text); white-space: nowrap; }
+  tr:nth-child(even) td { background: #dcebd6; }
+  td { color: var(--text); }
+  code { background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 1px 6px; font-family: Consolas, monospace; font-size: 12.5px; color: #b3305c; }
+  ol.steps { counter-reset: s; list-style: none; }
+  ol.steps li { position: relative; padding: 6px 0 6px 40px; }
+  ol.steps li::before { counter-increment: s; content: counter(s); position: absolute; left: 0; top: 7px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 13px; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+  ul.check { list-style: none; }
+  ul.check li { padding-left: 26px; position: relative; margin: 4px 0; }
+  ul.check li::before { content: "✓"; position: absolute; left: 2px; color: var(--ok); font-weight: bold; }
+  .tag { display: inline-block; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 1px 10px; font-size: 12px; margin: 1px 2px; }
+  .ok-text { color: var(--ok); } .warn-text { color: var(--warn); }
+  .tip { border-left: 3px solid var(--warn); background: rgba(138,97,0,.09); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 10px 0; font-size: 13.5px; }
+  .footer { margin-top: 40px; color: var(--faint); font-size: 12.5px; border-top: 1px solid var(--line); padding-top: 14px; }
+</style>
+</head>
+<body data-page-node-id="XIh60V9Oe02cDelH6OT0ti">
+<div class="wrap" data-page-node-id="7GFL8lUxEpuL5nSc6myD2w">
+
+<h1 data-page-node-id="BrQrWwYzsnOjBGdfWdHARQ">paperless-lite 使用说明</h1>
+<p data-page-node-id="sHE6rgbDHVZjYxfktDnjul">票据合同 OCR 文档库 · paperless-ngx 保真复刻版 · 适用于零基础用户</p>
+
+<h2 data-page-node-id="fPnylo9tbk30R6AC2uxTMD">一、这是什么？</h2>
+<div class="panel" data-page-node-id="lfypHrBH4CldIUkgGwuyV1">
+<p data-page-node-id="l9comeCdjvEBMFkDwHjRkZ">这是一个<b data-page-node-id="GTsMfbPVgoQ897BREEvJ08">本地文档管理器</b>，专门管理扫描件、照片版的票据和合同。你把文件丢进去，它自动完成三件事：</p>
+<ul class="check" style="margin-top:8px" data-page-node-id="EOHhP6AibS061uT2bFakXK">
+  <li data-page-node-id="EbRn66vkEbxj3cfwsIjXhF"><b data-page-node-id="cubG48L1xWktShEgq9br4v">认字（OCR）</b>—— 图片和扫描版 PDF 里的文字会被自动识别出来</li>
+  <li data-page-node-id="wCebe5SBUO9MBZGTBQp5HF"><b data-page-node-id="5PJP3nZkMH74Tf7Vim1VzA">贴标签</b>—— 按你定好的规则自动分类：发票、合同、收据、检测报告……</li>
+  <li data-page-node-id="Df0DYTWcjqSroJR7Qn25EH"><b data-page-node-id="iBAB0I9tyHTAdTb80B6CDb">能搜索</b>—— 之后输入任何一个词（比如「12800」「职业病」）都能秒搜到那份文件</li>
+</ul>
+<p style="margin-top:8px" data-page-node-id="i9zdTOcF6kDVZJlQkUiHjH">它复刻了开源项目 paperless-ngx（4.5 万 star）的核心玩法，全部在你的电脑本地运行，<b data-page-node-id="vA0TSiY9W2Krw9PXruAzAl">不需要联网、不需要任何账号或 API Key</b>，文件不会离开你的电脑。</p>
+</div>
+
+<h2 data-page-node-id="LdEI2PqzH8ujI3MX0xK4MI">二、怎么启动和关闭</h2>
+<table data-page-node-id="Szmv7J2UPVJOPfq5jPBoDL">
+  <tr data-page-node-id="c98kwonegsIeDmCp8YxRtt"><th style="width:110px" data-page-node-id="B5ELEFGWKDBXS5OZk2ADp9">操作</th><th data-page-node-id="7yrHVcTZI3cIIDIUenfOQ6">方法</th></tr>
+  <tr data-page-node-id="9jQEoNLuZHtF6QK4dbmknC"><td data-page-node-id="VZF8cCS1sBwXVe3Hdk6089"><b data-page-node-id="FixJRFnMSx2rAbc6TWu4LU">启动</b></td><td data-page-node-id="fQWqwGYFlDMRK2TRMfZvkE">打开文件夹 <code data-page-node-id="j0qBOsvhdllqmdZr3CFYZk">paperless-lite\</code>，双击 <code data-page-node-id="easCvpANcQZdkMSMVnK1vv">启动服务.pyw</code>。会弹出一个控制台窗口（<b>守护进程</b>：服务万一崩溃会 3 秒内自动重启，<span class="warn-text" data-page-node-id="w3ysk4Og9KEFmtQG5sKzHi">别关错</span>），然后浏览器自动打开界面。</td></tr>
+  <tr data-page-node-id="j79GYXwCFWSElI3EsnQ39P"><td data-page-node-id="9fdEdHecL5Gf1BFCxsHjiE"><b data-page-node-id="C7AvlNmcdBO4OhWIIfCi8M">关闭</b></td><td data-page-node-id="cAoSwfbxF7vT9hEWnlrokp">直接关掉那个守护进程控制台窗口即可。界面本身关掉不影响数据。</td></tr>
+  <tr data-page-node-id="BaSHF6uYn31qmkiR9FyCEt"><td data-page-node-id="aGsHgQkKFWJO4wfN9KntTP"><b data-page-node-id="V7xh1cTknuczPJhB1JA96x">地址</b></td><td data-page-node-id="g0as7UYZ9bQTwlEQMA0YtT">浏览器输入 <code data-page-node-id="m4XgcEEfrgjAV5CQ9wGzWM">127.0.0.1:8765</code> 随时访问（服务开着的时候）。</td></tr>
+</table>
+<div class="tip" data-page-node-id="8HfLuyIh4VNO8Dv44gfeXH">⚠️ 启动前建议先关掉 Firefox 和 QQ——这台机器内存只有 3.9 GB，OCR 识别时需要较多内存。数据都存在硬盘上，关机、重启都不会丢。</div>
+
+<h2 data-page-node-id="mQCGvel3uDEGbrGwk9lK2M">三、界面导览</h2>
+<table data-page-node-id="hmoLh9Dugk6tlk2RwHGw9H">
+  <tr data-page-node-id="exbhFoKNjlZ9b5jjidEq30"><th style="width:130px" data-page-node-id="P1oIBTsth3GjLxsvqUgaxA">区域</th><th data-page-node-id="sGEaD6sq3nlEaUpUr0fe8o">有什么用</th></tr>
+  <tr data-page-node-id="DOCqtUIoSB429qApoSFotO"><td data-page-node-id="sxmxcajJsGt0z49siTNcE6">顶部搜索框</td><td data-page-node-id="Udwb9QoB0s36ADKXqNFl34">输入任意词回车即搜，命中文字会<b data-page-node-id="31rlPATng3twkeZGlkweUw">黄色高亮</b>。支持 2 个字的长度的词、数字、日期、身份证号。</td></tr>
+  <tr data-page-node-id="12k5dCD3p4ayG5PQKoMUaT"><td data-page-node-id="yzTMDXFKLpStN9ieXn83eP">左侧标签栏</td><td data-page-node-id="ZP2nH4zrDDuJ4stMLudFRD">点某个标签 = 只看该类文件；标签后面的数字是文件数量。点「全部」恢复显示所有文件。</td></tr>
+  <tr data-page-node-id="2NVwmYHwbCBWYQuGSyaRW8"><td data-page-node-id="2O3Fqg2als78zatp0TcUUq">中间卡片网格</td><td data-page-node-id="sbE0dRyG1VpskYBHYEdhIr">每张卡片是一份文件，显示缩略图、标题、往来单位和标签。</td></tr>
+  <tr data-page-node-id="IpDBqxgrmvHV1Tb7yOypNx"><td data-page-node-id="aQelHwPQ1THLV1ru9iICsD">右侧详情面板</td><td data-page-node-id="sol5D3yQW7mzhLAMkooTtn">点开卡片后显示：大图预览、OCR 识别出的全文、往来单位、文件类型、标签（可手动增删）。</td></tr>
+</table>
+
+<h2 data-page-node-id="jsHDCIUG3OPqikqF8oQQjN">四、核心玩法：四步上手</h2>
+<ol class="steps" data-page-node-id="Oy5POf3eoevmSBGTkNMZqp">
+  <li data-page-node-id="OhXkofmv8fhdwwObKAGHsJ"><b data-page-node-id="Ee5of57CSft1Ltm5e4dRJV">上传</b>——点右上角「上传」按钮，一次可以选多个文件（png / jpg 图片，或 PDF）。</li>
+  <li data-page-node-id="3cN5cpPHj5BCllJIlCaX5j"><b data-page-node-id="v2IG5xiWGuSywMr5K0cLmO">等它处理</b>——卡片上会显示处理进度。识别完的卡片会自动带上标题、往来单位和标签。<span class="warn-text" data-page-node-id="6xZPfjiZfGED6hClkVHUr4">每页大约需要 10 秒</span>，是这台 2 核 CPU 的正常速度，批量上传时它会排队一份一份处理。</li>
+  <li data-page-node-id="W4xbXnwTiULea3iB8I4tX5"><b data-page-node-id="ArJqyjXTQM0el8EpxNg6NS">搜索</b>——在顶部搜任何你记得的词。比如搜「12800」能找到那份金额里含这个数的发票。</li>
+  <li data-page-node-id="CdDPNvgLQBuZXcGSTxdBJ7"><b data-page-node-id="oiMsEIW8BVcH2gFcDhVetk">管标签</b>——在详情面板里可以手动给文件加减标签；想自动化就去「规则」页面配置。</li>
+</ol>
+
+<h2 data-page-node-id="vxVivucvqjUnVzxUFJm5B6">五、自动标签规则怎么配（最好玩的部分）</h2>
+<p data-page-node-id="Uq9oPaUOvIARtK5rtmGDPk">规则 = 「文件里出现某些字 → 自动打上某标签」。支持四种匹配方式：</p>
+<table data-page-node-id="knKuBot7LRob69yvLelje4">
+  <tr data-page-node-id="hiCDUGXSNxK3XqRmOnvoBr"><th style="width:90px" data-page-node-id="4ftJ9aOGnOfaLAyRMadLLt">匹配方式</th><th data-page-node-id="LslbOBSy0YD0GG5EIgMqlm">含义</th><th data-page-node-id="XPiL5qHUtlhnNJ7LS2Iz5z">例子</th></tr>
+  <tr data-page-node-id="MC7EbAwxhWz21foa6cc3q3"><td data-page-node-id="HmejE2NSGyeDeBLnc9Inqd"><b data-page-node-id="fkq6flGtMQWaCWhbDXm4F0">任意词</b></td><td data-page-node-id="LjvVOb4CeBaD6nARggm06p">包含其中<b data-page-node-id="9pMG3e0Uhw3BYU51Sunqhx">任何一个</b>词就命中</td><td data-page-node-id="2T1HFFaG4rV5Ron8a5OGPG">规则「发票」匹配 <code data-page-node-id="XuDOlmc4ZqgKfmFNobY5Ge">增值税,发票,专用</code> → 文中出现任一词即打标</td></tr>
+  <tr data-page-node-id="PyHjApKzyU9mXwMt1wGRNY"><td data-page-node-id="xffU9ROeIRP69YCShG65dl"><b data-page-node-id="DVg8odFBak4GhcICsEgWH8">全部词</b></td><td data-page-node-id="hG6Az72PJVfcOjYamTfz9a">必须<b data-page-node-id="NE3W887GnQ4m0q6LR0HweD">同时包含</b>所有词才命中</td><td data-page-node-id="ulo0z2oprxH7yx1j9QGIxy">规则「双方合同」匹配 <code data-page-node-id="uohO23lqWsJSavJmBsjtnA">甲方,乙方</code> → 两词都有才算合同</td></tr>
+  <tr data-page-node-id="RGf5tLLxF8vVWS4hT7zQkQ"><td data-page-node-id="KI2CZKCA7J0b85CE0i145e"><b data-page-node-id="3klhff6GO0DPktc4KuQTOp">正则</b></td><td data-page-node-id="IiI4RWRJOZuRCNPzSsvw0N">用正则表达式精确匹配模式</td><td data-page-node-id="oyK0zChQPtkNVnKvTWlebk"><code data-page-node-id="HrOLv7DNor4EMxsGMG5EpQ">NO\.\d{8,}</code> 匹配所有「NO.12345678」格式的单据编号</td></tr>
+  <tr data-page-node-id="BOMyOrE5JrOHFR6750kcbq"><td data-page-node-id="LZh8o87aAzo7fFlqgaN0CQ"><b data-page-node-id="RWklrBedUMnVTnaFzjziez">全文</b></td><td data-page-node-id="dJArUlLBJWSn8FkZaFAJR5">包含这一整句话才命中</td><td data-page-node-id="Gy1MDAUdREymHGtdEAoGYt">匹配完整句子「职业健康检查结果」</td></tr>
+</table>
+<p data-page-node-id="x6yns0IFiPB0taPFdZ9SFL">规则创建后点「应用规则」，会对<b data-page-node-id="hLhKxvbpZZdxzWP6UYgMIM">所有已入库文件</b>重新匹配一遍；停用某条规则再应用，它打的标签会自动移除，不会留垃圾数据。</p>
+
+<h2 data-page-node-id="tHXdPPbWIzaPebPwSLEPmY">六、常见问题</h2>
+<table data-page-node-id="55teZe8JYmt9F26isVUIBH">
+  <tr data-page-node-id="kJVNxADzZdO7GU2G6iZJ17"><th style="width:220px" data-page-node-id="UAMyxLmHkrLOtETfrYxRoT">现象</th><th data-page-node-id="nL5X1zzNUFsSGMKRVNxP5x">原因与解决办法</th></tr>
+  <tr data-page-node-id="lLJAOSIv3tlascJg8DSDK5"><td data-page-node-id="hkmNtaC9fK4RMDNFm3LMEg">OCR 识别慢（每页 ~10 秒）</td><td data-page-node-id="EddVIUJ3Xsk3Dp5z3yAipf">正常现象。CPU 只有 2 核，已经是这台机器的物理极限，批量上传会自动排队，放着让它跑就行。</td></tr>
+  <tr data-page-node-id="Mlc213kVdi9acq5IHJF1kd"><td data-page-node-id="JCDGOttOW0cTo5mKwXmZG7">搜某个词搜不到，但文件里明明有</td><td data-page-node-id="LgM19PiE3pdriJtldh4Paa">大概率是 <b data-page-node-id="PjzMM2n4DlR3pvefgGXm6P">OCR 形近字</b>：比如「叁」被认成「参」。换不含形近字的片段搜索即可。</td></tr>
+  <tr data-page-node-id="c1ZqwPWlJHaWFHcrAW9GlI"><td data-page-node-id="cOEq7CCkB0dsc8QVIKrfNb">上传后一直「处理中」</td><td data-page-node-id="O1Tar9nL9YIVWohWVUirjB">前面还有文件在排队（串行处理）。多等几分钟；若超过 10 分钟，刷新页面看状态。</td></tr>
+  <tr data-page-node-id="1Fi54S336n7eUM7UkYHmEa"><td data-page-node-id="ra67LWix82N3v6WpKbHvN3">界面打不开</td><td data-page-node-id="CefkYU6uXB1Q2MnJRKJWPp">服务没启动或被关了 → 重新双击 <code data-page-node-id="x2tiLFk2NJFdFtE77ABC8w">启动服务.pyw</code>。</td></tr>
+  <tr data-page-node-id="y3Bcb2RfgILGgOXE18vMtE"><td data-page-node-id="BOOe9EK2vUsB0fWMXsm1rg">提示端口被占用（8765）</td><td data-page-node-id="J7cmo4qMFSqDQBTJ9OcQPE">已经有一个服务在跑了，直接浏览器打开 <code data-page-node-id="kl4ONdhR3wj47V5YBtuEQn">127.0.0.1:8765</code> 即可。</td></tr>
+  <tr data-page-node-id="r82qcHP6RLBZaW3zPHuPbf"><td data-page-node-id="Y7UBzbf56QvaQYAAEUIQFC">想备份数据</td><td data-page-node-id="KoEQwGWTN1KiRURBFCJBA7">双击 <code data-page-node-id="easCvpANcQZdkMSMVnK1vv">备份数据.pyw</code> 一键完成（自动存到 <code data-page-node-id="WPSFxzXDPmrFMjFADdk9uO">E:\paperless-lite-backup\时间戳\</code>，保留最近 5 份）。手动备份则复制 <code data-page-node-id="WPSFxzXDPmrFMjFADdk9uO">E:\paperless-lite-data</code> 整个文件夹。</td></tr>
+  <tr data-page-node-id="shareRow1"><td>想给同事共享访问</td><td>看下面「七、让同事在公司里访问」一节</td></tr>
+</table>
+
+<h2 data-page-node-id="share7">七、让同事在公司里访问</h2>
+<p>做完下面三步，同事在公司网络里用浏览器就能搜 / 看 / 下载你的文档。整套 5 分钟搞定，全程无需联网、无需外部账号。</p>
+
+<div class="panel" data-page-node-id="shareStep1">
+  <p style="margin-top-0"><b>第 1 步 · 打开防火墙端口（一次就够）</b></p>
+  <p>双击项目里的 <code>局域网共享.py</code>，会弹出黑色控制台窗口。选 <b>1</b>「开放局域网访问」，弹出的「用户账户控制」点「是」。这一步给你的电脑加一条防火墙放行规则，只对「公司/专用网络」开放，对咖啡厅之类「公用网络」不开放。</p>
+  <p>完成后窗口会显示同事的访问地址，例如 <code>http://192.168.1.100:8765</code>。把这个地址发给同事就行。</p>
+</div>
+
+<div class="panel" data-page-node-id="shareStep2">
+  <p style="margin-top-0"><b>第 2 步 · 首次打开设置账号密码</b></p>
+  <p>同事（或你自己）在浏览器打开那个地址，会先看到一个「设置访问密码」页面 —— 这是为了避免库一开始就裸奔：</p>
+  <ul class="check">
+    <li>填一个登录账号（比如「admin」或者你的名字）</li>
+    <li>填一个至少 6 位的密码</li>
+    <li>再输一次密码确认 → 点「设置并进入」</li>
+  </ul>
+  <p>密码只存在你自己电脑的 <code>E:\paperless-lite-data\auth.json</code> 里（哈希存的，不是明文），<b>不会外传、不会上传到任何地方</b>。之后同事每次打开都要先输这个账号密码才能看到文档。</p>
+</div>
+
+<div class="panel" data-page-node-id="shareStep3">
+  <p style="margin-top-0"><b>第 3 步 · 同事打开地址，登录，开始搜</b></p>
+  <p>同事用自己的电脑浏览器输 <code>http://你的IP:8765</code>，输账号密码登录后即可搜索 / 查看 / 下载全部文档（完全管理权限：能上传、删、改标签 —— 你做老板嘛）。</p>
+  <p>顶栏右上角有个「<b>退出</b>」按钮，共用一台电脑时换人用得到。</p>
+</div>
+
+<div class="tip">
+  <b>用完想关掉同事访问怎么办？</b><br>
+  双击 <code>局域网共享.py</code> → 选 <b>2</b>「关闭局域网访问」，防火墙规则就被删了，再没人能连进来。你自己照常用 <code>127.0.0.1:8765</code> 访问，不受影响。
+</div>
+
+<table>
+  <tr><th style="width:220px">同事访问不了？按这个顺序查</th><th>原因与解决办法</th></tr>
+  <tr><td>同事浏览器打不开地址</td><td>① 你自己先开 <code>127.0.0.1:8765</code>，确认服务在跑；② 让同事 ping 你的 IP，不通说明不同网段，得找网管；③ 用你电脑的浏览器开 <code>http://你的IP:8765</code>，你自己都打不开就是防火墙没生效，重新跑一遍「开放局域网访问」。</td></tr>
+  <tr><td>同事打开页面看到「错误次数太多」</td><td>同事输错密码超过 5 次，TA 的 IP 被锁 5 分钟（5 分钟自动解开；急用就让你重启 <code>启动服务.pyw</code>，立即解锁）。</td></tr>
+  <tr><td>你忘记密码了</td><td>关掉服务 → 删掉 <code>E:\paperless-lite-data\auth.json</code> → 重新启动服务 → 打开页面会要求重新设置账号密码。文档、标签、规则都不受影响。</td></tr>
+  <tr><td>公司有人反馈搜不到你机器</td><td>可能是公司网络做了 AP 隔离（同一 WiFi 下不允许互相访问），需要公司网管把你们的 IP 加入「允许互通」名单，或把库部署到公司服务器。</td></tr>
+</table>
+
+<div class="warn">
+  <b>三个真实存在的风险，老实跟你说清楚：</b>
+  <ul style="margin:6px 0 0 18px">
+    <li>同事用的网络是<b>明文 HTTP</b>，懂技术的人能抓包看到合同内容。公司内网一般可接受，但跟访客 WiFi 混用就别开。</li>
+    <li>这台机器只有 3.9 GB 内存、2 核 CPU，同事上传文件会触发 OCR 排队。偶尔一两个没事，同时传会卡死。</li>
+    <li><b>绝对不要做内网穿透</b>（花生壳 / frp / ngrok 等），把库暴露到公网会引来公网爬虫扫描 —— 风险远大于便利。</li>
+  </ul>
+</div>
+
+<h2 data-page-node-id="GHhSKz55h7ASCjJ9kyUmxI">八、文件位置速查</h2>
+<table data-page-node-id="b6zHikVSHab4U3DfdyAksF">
+  <tr data-page-node-id="8eviSVgJRwUK8hS4s43Pmy"><th style="width:280px" data-page-node-id="MEpUHvZNLeYNAxXh8VdNqT">路径</th><th data-page-node-id="8yfeAND2TRt4FfHCc4VwN3">内容</th></tr>
+  <tr data-page-node-id="UI0Am0D7jtkhBKX7lV9iBk"><td data-page-node-id="I5VGoLwX5ntaDyNZideqWl"><code data-page-node-id="PPSJgznEbLZV5fT5y402Io">paperless-lite\app.py</code></td><td data-page-node-id="fX2chyMUY43LsDR6P8Lsjl">后端主程序（一般不用动）</td></tr>
+  <tr data-page-node-id="jXg4qMRUCGbroFj1RCcKkV"><td data-page-node-id="burfMdR3Eex1r9BtauJdlK"><code data-page-node-id="vW6dw4Ro7Rn2sfBsGTlQwc">paperless-lite\core\</code></td><td data-page-node-id="Cd8m0TMRdLgxllKaC0iv88">数据库 / 规则引擎 / OCR 处理管线</td></tr>
+  <tr data-page-node-id="wTa9l25zTLh6Np4y5h7VAk"><td data-page-node-id="BBzFZE3dL13Ik2C2fxTryN"><code data-page-node-id="bj3gNBecugp2UZm358ynVg">paperless-lite\static\</code></td><td data-page-node-id="bv1ccUoqmF1lm6VTPyDa69">网页界面（HTML / CSS / JS）</td></tr>
+  <tr data-page-node-id="YwL081cERhFKEDXILmRgCR"><td data-page-node-id="f9zYIh4SXb50QagNRidHOd"><code data-page-node-id="aOxRBgvFtMhPNgX5RoT1EI">E:\paperless-lite-data\</code></td><td data-page-node-id="QfOLEC3lNwSCDc4q31yBxB"><b data-page-node-id="pQoUtVAb46KK7ca4RgQyCe">你的全部数据</b>（数据库 + 原始文件 + 缩略图），备份就备份它</td></tr>
+  <tr><td><code>E:\paperless-lite-backup\</code></td><td>一键备份的存放地，按时间戳分文件夹，自动保留最近 5 份</td></tr>
+  <tr><td><code>paperless-lite\备份数据.pyw</code></td><td><b>数据一键备份</b>（双击即可，服务运行中也能安全备份）</td></tr>
+  <tr data-page-node-id="Tvh76rNS3fuNyC56HbM9Ig"><td data-page-node-id="eC0Oz0Nts6GC7W2v8GNBtH"><code data-page-node-id="RpaTen5LdWFxD1jR1UiHy5">paperless-lite\tools\verify_all.py</code></td><td data-page-node-id="EIieghupu6EzsoxsRU2dG5">自动验收脚本，27 项检查，怀疑出问题时可跑一次</td></tr>
+  <tr data-page-node-id="tXL77O1CQ3LvkZtST4ZjZF"><td data-page-node-id="CVyW7UZkq41DRxjGYvRbhv"><code data-page-node-id="2k5Q5i4wHTm63WJIAmDUIG">paperless-lite\启动服务.pyw</code></td><td data-page-node-id="SraFYSUy29qlo3svAGkrCb">一键启动器（双击它）</td></tr>
+  <tr><td><code>paperless-lite\局域网共享.py</code></td><td><b>让同事访问</b>（双击它：1 开放 / 2 关闭 / 3 查看状态）</td></tr>
+</table>
+
+<div class="footer" data-page-node-id="CLoRzE2bAPgkOvXIMA9wTl">
+  paperless-lite · 灵感来自 paperless-ngx · 本地运行，数据不出电脑 · 验收状态：<span class="ok-text" data-page-node-id="nMM0O5kg5VtgejqKGa8bWQ">核心 27/27 + 鉴权 32/32 全部通过（2026-09-08）</span>
+</div>
+
+</div>
+</body>
+</html>
