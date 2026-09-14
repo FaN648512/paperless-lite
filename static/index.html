@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>票据合同 OCR 文档库</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo"></span>
+    <span class="brand-text">票据合同 OCR 文档库</span>
+  </div>
+
+  <div class="searchbox">
+    <svg viewBox="0 0 16 16" class="search-icon"><path d="M11.7 10.3a6 6 0 1 0-1.4 1.4l3.4 3.4a1 1 0 0 0 1.4-1.4zM7 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8z" fill="currentColor"/></svg>
+    <input id="search" type="search" placeholder="全文搜索：试试「发票」「合同」「检测报告」「12800」" autocomplete="off">
+    <div class="suggest-box" id="suggest-box" hidden></div>
+    <button id="search-clear" class="search-clear" title="清除">×</button>
+  </div>
+
+  <div class="topbar-actions">
+    <button id="btn-users" class="btn btn-ghost" title="用户管理（添加同事账号、重置密码）" hidden>用户管理</button>
+    <button id="btn-rules" class="btn btn-ghost">
+      <span>自动标签规则</span><span id="rules-badge" class="badge">0</span>
+    </button>
+    <button id="btn-folder" class="btn btn-ghost">导入文件夹</button>
+    <button id="btn-batch" class="btn btn-ghost" title="进入批量模式，给多份文档一起加/删标签">批量标签</button>
+    <button id="btn-upload" class="btn btn-primary">上传文档</button>
+    <button id="btn-logout" class="btn btn-ghost" title="退出登录（同事共用时换人用）" hidden>退出</button>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- 左侧筛选栏 -->
+  <aside class="sidebar">
+    <nav class="filter-group">
+      <div class="filter-title">
+        保存的视图
+        <button id="btn-save-view" class="mini-btn" title="把当前搜索+筛选保存为一个视图">＋</button>
+      </div>
+      <div id="view-list"></div>
+    </nav>
+    <nav class="filter-group">
+      <div class="filter-title">状态</div>
+      <a class="filter-item active" data-filter="status" data-value="">全部文档</a>
+      <a class="filter-item" data-filter="status" data-value="done">已处理</a>
+      <a class="filter-item" data-filter="status" data-value="working">处理中</a>
+      <a class="filter-item" data-filter="status" data-value="failed">失败</a>
+    </nav>
+
+    <nav class="filter-group">
+      <div class="filter-title">格式</div>
+      <div id="format-list"></div>
+    </nav>
+
+    <nav class="filter-group">
+      <div class="filter-title">
+        标签
+        <button id="btn-add-tag" class="mini-btn" title="新建标签">+</button>
+      </div>
+      <div id="tag-list" class="tag-list"></div>
+    </nav>
+
+    <nav class="filter-group">
+      <div class="filter-title">往来单位</div>
+      <div id="corr-list" class="tag-list"></div>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div id="stats" class="stats"></div>
+    </div>
+  </aside>
+
+  <!-- 主内容区 -->
+  <main class="content">
+    <div class="content-head">
+      <div class="result-info">
+        <span id="result-count">0</span> 份文档
+        <span id="result-query" class="result-query"></span>
+      </div>
+      <div class="view-toggle">
+        <button class="mini-btn active" data-view="grid" title="卡片视图">▦</button>
+        <button class="mini-btn" data-view="list" title="列表视图">☰</button>
+      </div>
+    </div>
+
+    <div id="dropzone" class="dropzone">
+      <div class="dropzone-inner">
+        <div class="dz-icon">＋</div>
+        <div class="dz-title">拖拽文件到这里，或点击选择</div>
+        <div class="dz-hint">支持 PDF、图片、Excel、PPT · 单文件最大 100MB</div>
+      </div>
+      <input id="file-input" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.bmp,.tif,.tiff,.webp,.xlsx,.xlsm,.xls,.pptx,.ppt" hidden>
+    </div>
+
+    <div id="doc-grid" class="doc-grid"></div>
+
+    <div id="empty-state" class="empty-state">
+      <div class="empty-icon">📄</div>
+      <div class="empty-title">还没有文档</div>
+      <div class="empty-hint">上传一张票据或合同的照片，系统会自动识别文字、打上标签，并让它可被搜索。</div>
+    </div>
+  </main>
+
+  <!-- 右侧详情面板 -->
+  <aside class="detail" id="detail-panel">
+    <div class="detail-empty">选择一份文档查看识别结果</div>
+  </aside>
+</div>
+
+<!-- 规则管理弹窗 -->
+<div class="modal" id="rules-modal" hidden>
+  <div class="modal-card">
+    <div class="modal-head">
+      <h3>自动标签规则</h3>
+      <button class="icon-btn" data-close="rules-modal">×</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-desc">
+        系统会对每篇文档的标题与正文跑一遍下面的规则，命中就自动打上对应标签。
+        改完规则点「对所有文档重跑」，已入库的文档会立刻按新规则重新归类。
+      </p>
+
+      <table class="rules-table">
+        <thead>
+          <tr><th style="width:88px">标签</th><th style="width:96px">作用字段</th><th style="width:96px">匹配方式</th><th>匹配内容</th><th style="width:64px">命中</th><th style="width:70px">操作</th></tr>
+        </thead>
+        <tbody id="rules-body"></tbody>
+      </table>
+
+      <div class="rule-form">
+        <h4>新建规则</h4>
+        <div class="form-row">
+          <label>标签名<input id="rule-tag" placeholder="例如：差旅报销"></label>
+          <label>作用字段
+            <select id="rule-field">
+              <option value="any">标题+正文</option>
+              <option value="title">仅标题</option>
+              <option value="content">仅正文</option>
+              <option value="correspondent">往来单位</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>匹配方式
+            <select id="rule-match">
+              <option value="any">任一关键词（空格分隔）</option>
+              <option value="all">全部关键词</option>
+              <option value="fulltext">全文子串</option>
+              <option value="regex">正则表达式</option>
+              <option value="exact">完全相等</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label style="flex:1">匹配内容<input id="rule-pattern" placeholder="例如：差旅费 住宿费 交通补助"></label>
+        </div>
+        <div class="form-row form-actions">
+          <span class="form-hint" id="rule-hint"></span>
+          <button id="btn-rule-save" class="btn btn-primary btn-sm">添加规则</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button id="btn-rules-apply" class="btn btn-ghost">对所有文档重跑规则</button>
+      <button class="btn btn-primary" data-close="rules-modal">完成</button>
+    </div>
+  </div>
+</div>
+
+<!-- 上传进度弹窗 -->
+<div class="modal" id="upload-modal" hidden>
+  <div class="modal-card modal-sm">
+    <div class="modal-head">
+      <h3>处理中</h3>
+      <button class="icon-btn" data-close="upload-modal">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="upload-list" class="upload-list"></div>
+    </div>
+    <div class="modal-foot">
+      <span class="foot-hint">可以关掉窗口先做别的，处理完成会自动出现在列表里</span>
+      <button class="btn btn-primary" data-close="upload-modal">后台继续</button>
+    </div>
+  </div>
+</div>
+
+<!-- 文件夹导入弹窗 -->
+<div class="modal" id="folder-modal" hidden>
+  <div class="modal-card modal-lg">
+    <div class="modal-head">
+      <h3>从文件夹导入</h3>
+      <button class="icon-btn" data-close="folder-modal">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="folder-scan-row">
+        <input id="folder-path" placeholder="输入文件夹路径，例如 E:\票据\2026" autocomplete="off">
+        <button id="btn-scan" class="btn btn-primary btn-sm">扫描</button>
+      </div>
+      <div id="folder-scan-summary" class="folder-summary" hidden></div>
+      <div id="folder-list" class="folder-list"></div>
+    </div>
+    <div class="modal-foot">
+      <span class="foot-hint" id="folder-count"></span>
+      <button class="btn btn-ghost" data-close="folder-modal">取消</button>
+      <button id="btn-folder-import" class="btn btn-primary" disabled>导入所选</button>
+    </div>
+  </div>
+</div>
+
+<!-- 用户管理（仅管理员可见） -->
+<div class="modal" id="users-modal" hidden>
+  <div class="modal-card modal-lg">
+    <div class="modal-head">
+      <h3>用户管理</h3>
+      <button class="icon-btn" data-close="users-modal">×</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-desc">
+        给同事开账号。每个账号上传的文档默认是「只读」——别人能看不能改；
+        同事可以在文档详情里把自己的文档改成「私密」或「公开编辑」。
+        <b>管理员（你）能查看和修改全部文档，不受限制。</b>
+      </p>
+
+      <table class="user-table">
+        <thead>
+          <tr><th>账号</th><th>身份</th><th>文档数</th><th>创建时间</th><th style="width:170px">操作</th></tr>
+        </thead>
+        <tbody id="user-list"></tbody>
+      </table>
+
+      <div class="user-add">
+        <div class="user-add-title">添加新用户</div>
+        <div class="user-add-row">
+          <input id="nu-name" placeholder="账号（至少 2 个字符）" autocomplete="off">
+          <input id="nu-pass" type="password" placeholder="密码（至少 6 位）" autocomplete="new-password">
+          <label class="user-admin-check">
+            <input type="checkbox" id="nu-admin"> 也设为管理员
+          </label>
+          <button class="btn btn-primary" id="btn-user-add">添加</button>
+        </div>
+        <div class="user-add-hint" id="nu-hint"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <span class="foot-hint">提示：同事忘了密码，你可以在这里直接给 TA 重置</span>
+      <button class="btn btn-ghost" data-close="users-modal">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- 通用提示弹窗（扫描无结果等情况） -->
+<div class="modal" id="notice-modal" hidden>
+  <div class="modal-card modal-sm">
+    <div class="modal-head">
+      <h3 id="notice-title">提示</h3>
+      <button class="icon-btn" data-close="notice-modal">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="notice-msg" class="notice-msg"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-primary" data-close="notice-modal">知道了</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<!-- 批量标签操作条（批量模式下显示） -->
+<div class="batch-bar" id="batch-bar" hidden>
+  <span class="batch-count">已选 <b id="batch-n">0</b> 份</span>
+  <select id="batch-tag" class="batch-select"></select>
+  <button id="batch-add" class="btn btn-sm btn-primary">添加标签</button>
+  <button id="batch-remove" class="btn btn-sm">移除标签</button>
+  <button id="batch-exit" class="btn btn-sm">退出批量</button>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# ---------------- 运行时数据 / 本机配置（绝不进库）----------------
+# 数据目录默认 ./data（原始文档、缩略图、SQLite 库、账号文件都在这里）
+data/
+local_settings.py
+*.db
+*.db-wal
+*.db-shm
+auth.json
+
+# ---------------- 测试与截图产物 ----------------
+tools/shots/
+tools/_thumbs/
+tools/officetest/
+tools/foldertest/
+tools/scantest_empty/
+tools/scantest_junk/
+tools/_perm_test.png
+tools/_shot_notice.png
+
+# ---------------- Python ----------------
+__pycache__/
+*.pyc
+*.pyo
+_*.py
+
+# ---------------- 系统 ----------------
+Thumbs.db
+desktop.ini
+.DS_Store

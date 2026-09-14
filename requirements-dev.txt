@@ -1,0 +1,9 @@
+# 开发 / 验收脚本的额外依赖（跑 tools/ 下的脚本时需要）
+# ======================================================
+# pip install -r requirements-dev.txt
+#
+# 说明：tools/ 里是开发期的验收脚本 —— 端到端接口验收、样例素材生成、
+#  Office 测试文件构造等。生产运行只需要 requirements.txt。
+
+# 构造老版 .xls 测试文件（tools/verify_office.py 用）
+xlwt==1.3.0

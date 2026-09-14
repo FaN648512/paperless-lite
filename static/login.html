@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>登录 · 票据合同文档库</title>
+<style>
+:root {
+    --bg: #14181d; --panel: #1c2127; --panel-2: #22282f;
+    --line: #313a44;
+    --txt: #e6edf3; --dim: #9aa7b4; --faint: #6e7d8c;
+    --acc: #7c9cff; --ok: #3fb950; --warn: #d29922; --bad: #f85149;
+}
+* { box-sizing: border-box; }
+html, body {
+    margin: 0; height: 100%;
+    background: var(--bg); color: var(--txt);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 14px; line-height: 1.6;
+}
+body { display: flex; align-items: center; justify-content: center; padding: 24px; }
+.card {
+    width: 100%; max-width: 400px;
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 12px; padding: 30px 28px 26px;
+}
+.logo { font-size: 17px; font-weight: 600; margin: 0 0 4px; }
+.sub { color: var(--dim); font-size: 13px; margin: 0 0 22px; }
+label { display: block; font-size: 13px; color: var(--dim); margin: 14px 0 6px; }
+input {
+    width: 100%; padding: 10px 12px; font-size: 14px;
+    background: var(--panel-2); color: var(--txt);
+    border: 1px solid var(--line); border-radius: 8px; outline: none;
+    font-family: inherit;
+}
+input:focus { border-color: var(--acc); }
+.btn {
+    width: 100%; margin-top: 20px; padding: 11px;
+    background: var(--acc); color: #0f1317;
+    border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:disabled { opacity: .6; cursor: default; }
+.err {
+    display: none; margin-top: 14px; padding: 9px 12px;
+    background: rgba(248,81,73,.1); border: 1px solid rgba(248,81,73,.35);
+    color: #ff9b95; border-radius: 8px; font-size: 13px;
+}
+.tip {
+    margin-top: 18px; padding: 10px 12px;
+    background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 8px; font-size: 12.5px; color: var(--dim);
+}
+.tip b { color: var(--txt); }
+.foot { margin-top: 16px; text-align: center; font-size: 12.5px; color: var(--faint); }
+.foot a { color: var(--acc); text-decoration: none; cursor: pointer; }
+.foot a:hover { text-decoration: underline; }
+hr { border: none; border-top: 1px solid var(--line); margin: 20px 0; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="card">
+    <p class="logo" id="title">票据合同文档库</p>
+    <p class="sub" id="sub">正在检查...</p>
+
+    <!-- 首次使用：设置账号密码 -->
+    <div id="pane-setup" class="hidden">
+        <label for="su-user">登录账号</label>
+        <input id="su-user" autocomplete="username" placeholder="例如 admin 或你的名字">
+
+        <label for="su-pwd">登录密码</label>
+        <input id="su-pwd" type="password" autocomplete="new-password" placeholder="至少 6 位">
+
+        <label for="su-pwd2">再输一次密码</label>
+        <input id="su-pwd2" type="password" autocomplete="new-password" placeholder="确认密码">
+
+        <button class="btn" id="btn-setup">设置并进入</button>
+        <div class="tip">
+            <b>这是第一次使用共享功能。</b><br>
+            设好之后，同事打开你的地址要先输这个账号密码才能看到文档。<br>
+            密码只存在你自己电脑的数据目录（<code>auth.json</code>，哈希存储），不会外传。
+        </div>
+    </div>
+
+    <!-- 日常登录 -->
+    <div id="pane-login" class="hidden">
+        <label for="lg-user">账号</label>
+        <input id="lg-user" autocomplete="username">
+
+        <label for="lg-pwd">密码</label>
+        <input id="lg-pwd" type="password" autocomplete="current-password">
+
+        <button class="btn" id="btn-login">登录</button>
+    </div>
+
+    <!-- 登录后：修改密码 -->
+    <div id="pane-change" class="hidden">
+        <label for="ch-old">原密码</label>
+        <input id="ch-old" type="password" autocomplete="current-password">
+
+        <label for="ch-new">新密码</label>
+        <input id="ch-new" type="password" autocomplete="new-password" placeholder="至少 6 位">
+
+        <label for="ch-new2">再输一次新密码</label>
+        <input id="ch-new2" type="password" autocomplete="new-password">
+
+        <button class="btn" id="btn-change">确认修改</button>
+        <div class="foot"><a id="link-back">返回文档库</a></div>
+    </div>
+
+    <div class="err" id="err"></div>
+
+    <div id="foot-logout" class="foot hidden">
+        已登录：<b id="who"></b> · <a id="link-change">修改密码</a> · <a id="link-logout">退出登录</a>
+    </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const pane = (name) => {
+    ['setup', 'login', 'change'].forEach(n => $('pane-' + n).classList.toggle('hidden', n !== name));
+};
+function showErr(msg) {
+    const el = $('err');
+    if (!msg) { el.style.display = 'none'; return; }
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+async function post(path, body) {
+    showErr('');
+    const res = await fetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body || {})
+    });
+    const j = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(j.error || ('请求失败（' + res.status + '）'));
+    return j;
+}
+
+async function init() {
+    const res = await fetch('/api/auth/status');
+    const s = await res.json();
+    if (s.need_setup) {
+        $('title').textContent = '设置访问密码';
+        $('sub').textContent = '第一次让同事访问，先设一个账号密码';
+        pane('setup');
+        $('su-user').focus();
+    } else if (s.logged_in) {
+        $('title').textContent = '账号设置';
+        $('sub').textContent = '已登录，可以修改密码或退出';
+        $('who').textContent = s.username;
+        $('foot-logout').classList.remove('hidden');
+        pane('change');
+    } else {
+        $('title').textContent = '票据合同文档库';
+        $('sub').textContent = '请输入账号密码以访问';
+        pane('login');
+        $('lg-user').focus();
+    }
+    return s;
+}
+
+$('btn-setup').onclick = async () => {
+    const u = $('su-user').value.trim();
+    const p = $('su-pwd').value;
+    const p2 = $('su-pwd2').value;
+    if (u.length < 2) return showErr('账号至少 2 个字符');
+    if (p.length < 6) return showErr('密码至少 6 位');
+    if (p !== p2) return showErr('两次输入的密码不一致');
+    try {
+        await post('/api/auth/setup', { username: u, password: p });
+        location.href = '/';
+    } catch (e) { showErr(e.message); }
+};
+
+$('btn-login').onclick = async () => {
+    const u = $('lg-user').value.trim();
+    const p = $('lg-pwd').value;
+    if (!u || !p) return showErr('账号和密码都要填');
+    try {
+        await post('/api/auth/login', { username: u, password: p });
+        location.href = '/';
+    } catch (e) { showErr(e.message); }
+};
+
+$('btn-change').onclick = async () => {
+    const o = $('ch-old').value, n = $('ch-new').value, n2 = $('ch-new2').value;
+    if (n.length < 6) return showErr('新密码至少 6 位');
+    if (n !== n2) return showErr('两次输入的新密码不一致');
+    try {
+        await post('/api/auth/password', { old_password: o, new_password: n });
+        alert('密码已修改，请重新登录');
+        location.href = '/login';
+    } catch (e) { showErr(e.message); }
+};
+
+$('link-logout').onclick = async () => {
+    await post('/api/auth/logout', {});
+    location.href = '/login';
+};
+$('link-change').onclick = () => pane('change');
+$('link-back').onclick = () => location.href = '/';
+
+// 回车提交
+['su-user', 'su-pwd', 'su-pwd2'].forEach(id => $(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') $('btn-setup').click();
+}));
+['lg-user', 'lg-pwd'].forEach(id => $(id).addEventListener('keydown', e => {
+    if (e.key === 'Enter') $('btn-login').click();
+}));
+
+init();
+</script>
+</body>
+</html>
